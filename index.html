@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checa Aí</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+/* Layout: coluna única pensada para celular; abas fixas no topo; cada ferramenta é um painel. */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#14213d; --muted:#55607a; --line:#d8dde7;
+  --accent:#1f5eff; --accent-ink:#ffffff; --accent-soft:#e6edff;
+  --ok:#11845b; --ok-soft:#e3f5ee; --warn:#b26a00; --warn-soft:#fff3dc; --bad:#c62f3a; --bad-soft:#fde8ea;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1524; --surface:#172036; --ink:#e8ecf5; --muted:#a3adc4; --line:#2a3550;
+    --accent:#6d97ff; --accent-ink:#0b1020; --accent-soft:#1d2a4d;
+    --ok:#3fcf95; --ok-soft:#123326; --warn:#f2b44d; --warn-soft:#3a2b10; --bad:#ff7b84; --bad-soft:#3d1a1f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1524; --surface:#172036; --ink:#e8ecf5; --muted:#a3adc4; --line:#2a3550;
+  --accent:#6d97ff; --accent-ink:#0b1020; --accent-soft:#1d2a4d;
+  --ok:#3fcf95; --ok-soft:#123326; --warn:#f2b44d; --warn-soft:#3a2b10; --bad:#ff7b84; --bad-soft:#3d1a1f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{background:var(--surface);border-bottom:1px solid var(--line)}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+.brand{display:flex;align-items:center;gap:12px;padding:18px 0 10px}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--accent);display:grid;place-items:center;flex:none}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:1.7rem;font-weight:800;letter-spacing:-.01em}
+.tag{color:var(--muted);font-size:.92rem;margin:0}
+nav{display:flex;gap:6px;overflow-x:auto;padding:8px 0 12px;scrollbar-width:none}
+nav a{flex:none;text-decoration:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-weight:700;font-size:.93rem}
+nav a[aria-current="page"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+main{padding:22px 0 40px}
+section.panel{display:none}
+section.panel.on{display:block}
+.intro h2{font-size:1.45rem;font-weight:800;margin-bottom:6px}
+.intro p{color:var(--muted);margin:0 0 16px;max-width:62ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;margin-bottom:14px}
+label{font-weight:700}
+input[type=text],input[type=url],textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;font:inherit;font-weight:700;font-size:.95rem;text-decoration:none;cursor:pointer;border-radius:10px;padding:10px 14px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
+.hint{color:var(--muted);font-size:.9rem;margin:0}
+.list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.list li{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.steps{margin:0;padding-left:1.3em;display:grid;gap:8px}
+/* roteiro */
+.q{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;width:max-content}
+.seg button{font:inherit;font-weight:700;border:0;background:transparent;color:var(--ink);padding:8px 16px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.result{border-radius:12px;padding:14px 16px;border-left:6px solid var(--muted);background:var(--bg)}
+.result.low{border-color:var(--ok);background:var(--ok-soft)}
+.result.mid{border-color:var(--warn);background:var(--warn-soft)}
+.result.high{border-color:var(--bad);background:var(--bad-soft)}
+.result strong{font-family:var(--display);font-size:1.15rem;display:block;margin-bottom:4px}
+.meter{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;background:var(--accent);transition:width .25s}
+@media (prefers-reduced-motion: reduce){.meter span{transition:none}}
+/* treino */
+.msg{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:.98rem}
+.msg .from{font-size:.82rem;color:var(--muted);font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.feedback{border-radius:12px;padding:12px 14px}
+.feedback.right{background:var(--ok-soft)}
+.feedback.wrong{background:var(--bad-soft)}
+.pill{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:999px}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.score{font-family:var(--display);font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.88rem;padding:18px 0 28px}
+@media (max-width:420px){body{font-size:16px}.card{padding:14px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="m7.8 10.6 1.9 1.9 3.6-3.8"/></svg>
+      </div>
+      <div>
+        <h1>Checa Aí</h1>
+        <p class="tag">Recebeu algo suspeito? Confira antes de acreditar ou repassar.</p>
+      </div>
+    </div>
+    <nav aria-label="Ferramentas">
+      <a href="#roteiro">Recebi algo suspeito</a>
+      <a href="#checar">Já foi checado?</a>
+      <a href="#imagem">Checar imagem</a>
+      <a href="#treino">Treinar</a>
+      <a href="#golpe">Caí num golpe</a>
+      <a href="#proteger">Proteger contas</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ROTEIRO -->
+  <section class="panel" id="p-roteiro" aria-labelledby="h-roteiro">
+    <div class="intro">
+      <h2 id="h-roteiro">Responda 8 perguntas sobre o que você recebeu</h2>
+      <p>Vale para mensagem, áudio, vídeo, imagem ou link. O resultado mostra o nível de risco e o que fazer em seguida.</p>
+    </div>
+    <div class="card">
+      <div class="meter" aria-hidden="true"><span id="meter" style="width:0%"></span></div>
+      <div id="questions"></div>
+      <div id="verdict" class="result" aria-live="polite"><strong>Responda as perguntas acima</strong>O resultado aparece aqui conforme você marca as respostas.</div>
+      <div class="btns"><button class="btn ghost" id="reset-roteiro" type="button">Recomeçar</button></div>
+    </div>
+  </section>
+
+  <!-- CHECAR -->
+  <section class="panel" id="p-checar" aria-labelledby="h-checar">
+    <div class="intro">
+      <h2 id="h-checar">Veja se alguma agência já checou o assunto</h2>
+      <p>Escreva as palavras principais da notícia ou da mensagem, por exemplo: <em>saque extra FGTS novembro</em>. Os botões abrem a busca já pronta.</p>
+    </div>
+    <form class="card" id="form-checar">
+      <label for="q-checar">Do que fala o conteúdo?</label>
+      <input type="text" id="q-checar" placeholder="Ex.: vídeo apresentador investimento garantido" autocomplete="off">
+      <div class="btns" id="btns-checar"></div>
+      <p class="hint">Dica: use 3 a 5 palavras e evite frases inteiras. Se nada aparecer, isso não prova que é verdade; pode ser um conteúdo novo.</p>
+    </form>
+    <div class="card">
+      <h3>Agências de checagem</h3>
+      <ul class="list">
+        <li><span><strong>Lupa</strong></span><a href="https://lupa.uol.com.br" target="_blank" rel="noopener">Abrir site</a></li>
+        <li><span><strong>Aos Fatos</strong></span><a href="https://www.aosfatos.org" target="_blank" rel="noopener">Abrir site</a></li>
+        <li><span><strong>Fato ou Fake (g1)</strong></span><a href="https://g1.globo.com/fato-ou-fake/" target="_blank" rel="noopener">Abrir site</a></li>
+        <li><span><strong>Estadão Verifica</strong></span><a href="https://www.estadao.com.br/estadao-verifica/" target="_blank" rel="noopener">Abrir site</a></li>
+        <li><span><strong>UOL Confere</strong></span><a href="https://noticias.uol.com.br/confere/" target="_blank" rel="noopener">Abrir site</a></li>
+        <li><span><strong>Projeto Comprova</strong></span><a href="https://projetocomprova.com.br" target="_blank" rel="noopener">Abrir site</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- IMAGEM -->
+  <section class="panel" id="p-imagem" aria-labelledby="h-imagem">
+    <div class="intro">
+      <h2 id="h-imagem">Descubra de onde veio uma imagem</h2>
+      <p>A busca reversa mostra onde a imagem já apareceu antes. Se ela foi publicada anos atrás ou em outro lugar, a mensagem que você recebeu está fora de contexto.</p>
+    </div>
+    <form class="card" id="form-imagem">
+      <label for="q-imagem">Link da imagem</label>
+      <input type="url" id="q-imagem" placeholder="https://..." autocomplete="off">
+      <div class="btns" id="btns-imagem"></div>
+      <p class="hint">Para pegar o link: toque e segure na imagem e escolha “Copiar endereço da imagem”.</p>
+    </form>
+    <div class="card">
+      <h3>Recebeu a imagem pelo WhatsApp?</h3>
+      <ol class="steps">
+        <li>Salve a imagem no celular.</li>
+        <li>Abra o app <strong>Google</strong> e toque no ícone da câmera (Google Lens) na barra de busca.</li>
+        <li>Escolha a imagem salva e role até <strong>Correspondências exatas</strong> ou <strong>Sobre esta imagem</strong>.</li>
+        <li>Olhe a <strong>data mais antiga</strong> em que ela aparece e em que site.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Sinais de vídeo ou áudio manipulado</h3>
+      <ul class="steps">
+        <li>Boca fora de sincronia com a fala, ou dentes e língua borrados.</li>
+        <li>Bordas do rosto tremidas, pele lisa demais, piscadas estranhas ou ausentes.</li>
+        <li>Mãos, orelhas e brincos deformados; fundo que “derrete” quando a pessoa se mexe.</li>
+        <li>Voz sem respiração, entonação robótica ou cortes no meio das palavras.</li>
+        <li>Pessoa famosa vendendo algo com “retorno garantido” ou pedindo dados.</li>
+      </ul>
+      <p class="hint">Nenhum sinal sozinho prova nada, e deepfakes bons não mostram nenhum. Por isso, confirme sempre a fonte.</p>
+    </div>
+  </section>
+
+  <!-- TREINO -->
+  <section class="panel" id="p-treino" aria-labelledby="h-treino">
+    <div class="intro">
+      <h2 id="h-treino">Treine com 8 situações</h2>
+      <p>Situações baseadas em golpes comuns. Decida se é golpe ou conteúdo falso, ou se parece legítimo, e veja a explicação.</p>
+    </div>
+    <div class="card" id="quiz" aria-live="polite"></div>
+  </section>
+
+  <!-- GOLPE -->
+  <section class="panel" id="p-golpe" aria-labelledby="h-golpe">
+    <div class="intro">
+      <h2 id="h-golpe">Caiu num golpe? Faça isto agora</h2>
+      <p>Quanto mais rápido, maior a chance de recuperar o dinheiro ou a conta.</p>
+    </div>
+    <div class="card">
+      <ol class="steps">
+        <li><strong>Pare de responder</strong> e não envie mais nenhum valor ou código, mesmo que o golpista ameace ou insista.</li>
+        <li><strong>Ligue para o seu banco</strong> pelo número do cartão ou do aplicativo. Se foi Pix, peça a abertura do <strong>MED</strong> (Mecanismo Especial de Devolução).</li>
+        <li><strong>Guarde as provas</strong>: prints da conversa, número do golpista, comprovantes e links.</li>
+        <li><strong>Registre um boletim de ocorrência</strong> na delegacia ou na Delegacia Online da Polícia Civil do seu estado.</li>
+        <li><strong>WhatsApp clonado?</strong> Avise seus contatos por outro meio, reinstale o app para recuperar a conta e ative a confirmação em duas etapas.</li>
+        <li><strong>Troque as senhas</strong> das contas afetadas, começando pelo e-mail.</li>
+        <li><strong>Denuncie</strong> o perfil, anúncio ou número na própria plataforma.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- PROTEGER -->
+  <section class="panel" id="p-proteger" aria-labelledby="h-proteger">
+    <div class="intro">
+      <h2 id="h-proteger">Proteja suas contas em 10 minutos</h2>
+      <p>Marque o que você já fez. Os itens ficam salvos só neste aparelho.</p>
+    </div>
+    <div class="card" id="protect"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    O Checa Aí não diz o que é verdade: ele ajuda você a investigar. Na dúvida, não compartilhe.<br>
+    Projeto de Extensão II · Análise e Desenvolvimento de Sistemas · Unigranrio Afya, Duque de Caxias (RJ).
+  </div>
+</footer>
+
+<script>
+(function(){
+  const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+  /* ---------- navegação por hash ---------- */
+  const views=["roteiro","checar","imagem","treino","golpe","proteger"];
+  function show(){
+    const h=(location.hash||"").replace("#","");
+    const v=views.includes(h)?h:"roteiro";
+    views.forEach(n=>document.getElementById("p-"+n).classList.toggle("on",n===v));
+    document.querySelectorAll("nav a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+v?"page":"false"));
+  }
+  addEventListener("hashchange",()=>{show();scrollTo(0,0)});
+  show();
+
+  /* ---------- roteiro de risco ---------- */
+  const Q=[
+    {t:"Pede dinheiro, Pix, dados pessoais, senha ou código recebido por SMS?",w:4},
+    {t:"Cria urgência ou medo? (“últimas horas”, “sua conta será bloqueada”, “compartilhe antes que apaguem”)",w:2},
+    {t:"Vem de número novo ou desconhecido, mesmo dizendo ser alguém conhecido?",w:3},
+    {t:"Tem link encurtado, endereço estranho ou site que não é o oficial?",w:3},
+    {t:"Não informa a fonte, ou nenhum veículo conhecido publicou o mesmo fato?",w:2},
+    {t:"Promete ganho fácil, prêmio, benefício ou “retorno garantido”?",w:3},
+    {t:"O vídeo ou áudio tem sinais estranhos (boca fora de sincronia, voz robótica, rosto borrado)?",w:2},
+    {t:"A imagem ou notícia parece antiga, de outro lugar ou fora de contexto?",w:2}
+  ];
+  const ans=Array(Q.length).fill(null);
+  const qbox=document.getElementById("questions");
+  Q.forEach((q,i)=>{
+    const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span id="ql${i}">${i+1}. ${q.t}</span><div class="seg" role="group" aria-labelledby="ql${i}"><button type="button" data-i="${i}" data-v="1" aria-pressed="false">Sim</button><button type="button" data-i="${i}" data-v="0" aria-pressed="false">Não</button><button type="button" data-i="${i}" data-v="-1" aria-pressed="false">Não sei</button></div>`;
+    qbox.appendChild(d);
+  });
+  qbox.addEventListener("click",e=>{
+    const b=e.target.closest("button[data-i]");if(!b)return;
+    const i=+b.dataset.i;ans[i]=+b.dataset.v;
+    b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+    evaluate();
+  });
+  function evaluate(){
+    const done=ans.filter(a=>a!==null).length;
+    document.getElementById("meter").style.width=(done/Q.length*100)+"%";
+    const max=Q.reduce((s,q)=>s+q.w,0);
+    let score=0;ans.forEach((a,i)=>{if(a===1)score+=Q[i].w;if(a===-1)score+=Q[i].w/2});
+    const asksMoney=ans[0]===1;
+    const v=document.getElementById("verdict");
+    if(done===0){v.className="result";v.innerHTML="<strong>Responda as perguntas acima</strong>O resultado aparece aqui conforme você marca as respostas.";return}
+    const pct=score/max;
+    let cls,title,body;
+    if(asksMoney||pct>=.4){cls="high";title="Risco alto: trate como golpe ou conteúdo falso";
+      body="Não clique, não pague e não repasse. Se a mensagem fala em nome de alguém conhecido, ligue para a pessoa no número que você já tinha, ou faça a pergunta da palavra de segurança combinada com a família. Se for notícia, procure em “Já foi checado?”."}
+    else if(pct>=.15){cls="mid";title="Atenção: ainda não dá para confiar";
+      body="Confirme antes de acreditar. Procure o mesmo fato em pelo menos dois veículos conhecidos, use “Já foi checado?” e, se tiver imagem, faça a busca reversa em “Checar imagem”."}
+    else{cls="low";title="Risco baixo pelas respostas";
+      body="Mesmo assim, confira a data e a fonte antes de compartilhar. Conteúdo verdadeiro também pode estar fora de contexto."}
+    v.className="result "+cls;
+    v.innerHTML=`<strong>${title}</strong>${body}${done<Q.length?`<br><span class="hint">Você respondeu ${done} de ${Q.length} perguntas.</span>`:""}`;
+  }
+  document.getElementById("reset-roteiro").addEventListener("click",()=>{
+    ans.fill(null);qbox.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed","false"));evaluate();
+  });
+
+  /* ---------- já foi checado ---------- */
+  const enc=encodeURIComponent;
+  const sitesChecagem="site:lupa.uol.com.br OR site:aosfatos.org OR site:g1.globo.com/fato-ou-fake OR site:estadao.com.br/estadao-verifica OR site:noticias.uol.com.br/confere OR site:projetocomprova.com.br";
+  const checkTargets=[
+    {l:"Buscar nas agências",u:q=>"https://www.google.com/search?q="+enc(q+" "+sitesChecagem)},
+    {l:"Google Fact Check Explorer",u:q=>"https://toolbox.google.com/factcheck/explorer/search/"+enc(q)+";hl=pt"},
+    {l:"Buscar em notícias",u:q=>"https://news.google.com/search?q="+enc(q)+"&hl=pt-BR&gl=BR&ceid=BR:pt-419"}
+  ];
+  function renderLinks(boxId,inputId,targets,valid){
+    const box=document.getElementById(boxId),inp=document.getElementById(inputId);
+    function draw(){
+      const q=inp.value.trim(),ok=valid(q);
+      box.innerHTML="";
+      targets.forEach((t,i)=>{
+        const a=document.createElement("a");a.className="btn"+(i?" ghost":"");a.textContent=t.l;a.target="_blank";a.rel="noopener";
+        if(ok){a.href=t.u(q)}else{a.setAttribute("aria-disabled","true");a.href="#"}
+        box.appendChild(a);
+      });
+    }
+    inp.addEventListener("input",draw);draw();
+  }
+  renderLinks("btns-checar","q-checar",checkTargets,q=>q.length>2);
+  document.getElementById("form-checar").addEventListener("submit",e=>e.preventDefault());
+
+  /* ---------- imagem ---------- */
+  const imgTargets=[
+    {l:"Google Lens",u:q=>"https://lens.google.com/uploadbyurl?url="+enc(q)},
+    {l:"TinEye",u:q=>"https://tineye.com/search?url="+enc(q)},
+    {l:"Bing",u:q=>"https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:"+enc(q)},
+    {l:"Yandex",u:q=>"https://yandex.com/images/search?rpt=imageview&url="+enc(q)}
+  ];
+  renderLinks("btns-imagem","q-imagem",imgTargets,q=>/^https?:\/\/\S+$/i.test(q));
+  document.getElementById("form-imagem").addEventListener("submit",e=>e.preventDefault());
+
+  /* ---------- treino ---------- */
+  const S=[
+    {from:"WhatsApp · número desconhecido",m:"“Oi mãe, troquei de número, salva esse. Tô com um problema no banco e preciso pagar um boleto hoje, me faz um Pix de R$ 1.800 que amanhã te devolvo?”",a:"golpe",e:"Golpe do número novo. Número diferente, pedido de dinheiro e pressa são os três sinais clássicos. Ligue para o número antigo do seu filho ou pergunte a palavra de segurança da família."},
+    {from:"Anúncio no Instagram",m:"Vídeo de um apresentador de TV famoso dizendo: “Eu mesmo uso esse aplicativo e ganho R$ 3 mil por semana. Retorno garantido, vagas limitadas, clique no link.”",a:"golpe",e:"Uso típico de deepfake: rosto e voz de famoso vendendo investimento. Ninguém sério promete retorno garantido. Procure o nome do app em “Já foi checado?”."},
+    {from:"SMS",m:"“BANCO: Detectamos acesso suspeito. Sua conta será BLOQUEADA em 2h. Regularize em: bit.ly/seg-conta-br”",a:"golpe",e:"Phishing. Bancos não mandam link encurtado pedindo para “regularizar”. Abra o aplicativo oficial do banco ou ligue para o número do cartão."},
+    {from:"Grupo da família",m:"Link para uma reportagem do g1 de hoje sobre mudança no horário de funcionamento das agências do INSS. O mesmo assunto aparece no site do governo e em outros dois jornais.",a:"ok",e:"Parece legítimo: o link é do site oficial do veículo, a data é atual e outras fontes confirmam. Mesmo assim, vale abrir o link em vez de confiar só no print."},
+    {from:"Grupo do bairro",m:"Foto de ruas alagadas com a legenda: “AGORA em Duque de Caxias, ninguém está mostrando isso!”. A busca reversa mostra a mesma foto publicada em 2019, em outro país.",a:"golpe",e:"Conteúdo fora de contexto. A imagem é real, mas é antiga e de outro lugar. É um dos tipos mais comuns de desinformação, e a busca reversa resolve."},
+    {from:"Ligação telefônica",m:"“Aqui é da central de segurança do seu cartão. Vamos cancelar uma compra suspeita. Você vai receber um código por SMS, me informe para confirmarmos.”",a:"golpe",e:"Nenhuma central pede código recebido por SMS. Esse código é a chave da sua conta. Desligue e ligue você mesmo para o número do cartão."},
+    {from:"E-mail institucional",m:"E-mail do endereço oficial da faculdade avisando a mudança de data de uma prova. O mesmo aviso está publicado no portal do aluno.",a:"ok",e:"Parece legítimo: o remetente é oficial e o aviso está confirmado no portal. Conferir em um segundo canal oficial é o hábito certo."},
+    {from:"WhatsApp · encaminhado com frequência",m:"Vídeo curto de um político dizendo uma frase chocante. Nenhum jornal noticiou, a boca parece fora de sincronia e o vídeo só circula em grupos.",a:"golpe",e:"Forte suspeita de deepfake. Se fosse real, a imprensa teria noticiado. Ninguém noticiar, junto com os sinais visuais, já é motivo para não repassar."}
+  ];
+  let idx=0,hits=0,answered=false;
+  const quiz=document.getElementById("quiz");
+  function drawQ(){
+    answered=false;
+    if(idx>=S.length){
+      quiz.innerHTML=`<div class="score">${hits}/${S.length}</div><p style="margin:0">${hits>=7?"Excelente: você reconhece os sinais principais.":hits>=5?"Bom resultado. Revise as situações que você errou.":"Vale treinar mais: releia as explicações e use o roteiro “Recebi algo suspeito”."}</p><div class="btns"><button class="btn" type="button" id="again">Treinar de novo</button></div>`;
+      document.getElementById("again").onclick=()=>{idx=0;hits=0;drawQ()};
+      return;
+    }
+    const s=S[idx];
+    quiz.innerHTML=`<div class="progress"><span>Situação ${idx+1} de ${S.length}</span><span>${hits} acerto${hits===1?"":"s"}</span></div>
+      <div class="msg"><div class="from">${s.from}</div>${s.m}</div>
+      <div class="btns"><button class="btn" type="button" data-a="golpe">Golpe ou falso</button><button class="btn ghost" type="button" data-a="ok">Parece legítimo</button></div>
+      <div id="fb"></div>`;
+  }
+  quiz.addEventListener("click",e=>{
+    const b=e.target.closest("button[data-a]");
+    if(b&&!answered){
+      answered=true;const s=S[idx],right=b.dataset.a===s.a;if(right)hits++;
+      quiz.querySelectorAll("button[data-a]").forEach(x=>x.setAttribute("aria-disabled","true"));
+      document.getElementById("fb").innerHTML=`<div class="feedback ${right?"right":"wrong"}"><span class="pill ${s.a==="golpe"?"bad":"ok"}">${s.a==="golpe"?"Golpe ou falso":"Legítimo"}</span> <strong>${right?"Você acertou.":"Não foi dessa vez."}</strong><br>${s.e}</div><div class="btns" style="margin-top:10px"><button class="btn" type="button" id="next">${idx+1<S.length?"Próxima situação":"Ver resultado"}</button></div>`;
+      quiz.querySelector(".progress span:last-child").textContent=hits+" acerto"+(hits===1?"":"s");
+      return;
+    }
+    if(e.target.id==="next"){idx++;drawQ()}
+  });
+  drawQ();
+
+  /* ---------- proteger ---------- */
+  const P=[
+    {t:"Ativei a confirmação em duas etapas no WhatsApp",h:"WhatsApp › Configurações › Conta › Confirmação em duas etapas › Ativar. Crie um PIN de 6 dígitos e cadastre um e-mail."},
+    {t:"Minha foto de perfil aparece só para meus contatos",h:"WhatsApp › Configurações › Privacidade › Foto do perfil › Meus contatos. Isso dificulta que usem sua foto para se passar por você."},
+    {t:"Combinei uma palavra de segurança com a família",h:"Uma palavra que só vocês sabem. Se alguém pedir dinheiro por mensagem ou áudio, peça a palavra antes de qualquer coisa."},
+    {t:"Ativei a verificação em duas etapas no meu e-mail",h:"No Gmail: conta Google › Segurança › Verificação em duas etapas. O e-mail é a chave para recuperar todas as outras contas."},
+    {t:"Sei que nenhum banco pede código por SMS ou senha",h:"Se pedirem, é golpe. Desligue e ligue você mesmo para o número oficial."},
+    {t:"Salvei uma agência de checagem nos favoritos",h:"Use os links da aba “Já foi checado?”."}
+  ];
+  const saved=store.get("checaai-protect",[]);
+  const box=document.getElementById("protect");
+  function drawP(){
+    const n=P.filter((_,i)=>saved.includes(i)).length;
+    box.innerHTML=`<div class="progress"><span>${n} de ${P.length} concluídos</span><span>${Math.round(n/P.length*100)}%</span></div><div class="meter" aria-hidden="true"><span style="width:${n/P.length*100}%"></span></div>`+
+      P.map((p,i)=>`<div class="q"><label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="checkbox" id="pr${i}" data-i="${i}" ${saved.includes(i)?"checked":""} style="width:20px;height:20px;margin-top:3px;flex:none"><span>${p.t}</span></label><p class="hint" style="margin-left:30px">${p.h}</p></div>`).join("");
+  }
+  box.addEventListener("change",e=>{
+    const i=+e.target.dataset.i;const k=saved.indexOf(i);
+    if(e.target.checked&&k<0)saved.push(i);if(!e.target.checked&&k>=0)saved.splice(k,1);
+    store.set("checaai-protect",saved);drawP();document.getElementById("pr"+i).focus();
+  });
+  drawP();
+})();
+</script>
+</body>
+</html>
