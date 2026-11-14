@@ -27,7 +27,7 @@ Baixe o repositório e abra o arquivo `index.html` no navegador. Não precisa in
 
 Desenvolvido em grupo para a disciplina Projeto de Extensão II do curso de Análise e Desenvolvimento de Sistemas da Unigranrio Afya (Duque de Caxias, RJ), para ser usado em uma oficina presencial de treinamento sobre identificação de deepfakes e prevenção de golpes digitais.
 
-Integrantes: Daniel Silva Mendes de Luna e Cauã Duarte Vieira.
+Integrantes: Cauã Duarte Vieira, Daniel Silva Mendes de Luna e Dhony Moreira Bispo.
 Professor: Carlos Ribeiro da Cunha.
 
 ## Aviso
