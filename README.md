@@ -7,4 +7,4 @@ Projeto de Extensão II · Análise e Desenvolvimento de Sistemas · Unigranrio 
 Integrantes: Daniel Silva Mendes de Luna e Cauã Duarte Vieira.
 Professor: Carlos Ribeiro da Cunha.
 
-Acesse: https://dhonymoreirab-sudo.github.io/checa-ai/
+Acesse: https://dhony-bispo.github.io/checa-ai/
